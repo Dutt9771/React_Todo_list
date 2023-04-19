@@ -1,37 +1,39 @@
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import FormControl from "@mui/material/FormControl";
-import ListItem from "@mui/material/ListItem";
-import List from "@mui/material/List";
-import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction";
+import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import ListItemText from "@mui/material/ListItemText";
-import IconButton from "@mui/material/IconButton";
-
-
 import Button from "@mui/material/Button";
-import React, { useEffect,useState } from "react";
+import React, {useEffect,useState } from "react";
 
 
 export default function Todo() {
-  const [todos , setTodos] = useState(localStorage.getItem('todos')  || []);
   const [newTodo , setNewTodo] = useState("");
-
+  const [open,setOpen] = useState(true);
+  let [todos , setTodos] = useState(JSON.parse(localStorage.getItem('todos')) || []);
+  
+  // if(localStorage.getItem('todos')){
+  //   todos=JSON.parse(localStorage.getItem('todos'));
+  //   console.log("todos",todos);
+  // // }
   useEffect(() => {
+    if(!localStorage.getItem('todos')){
+      localStorage.setItem('todos', JSON.stringify([]));
+    }
     localStorage.setItem('todos', JSON.stringify(todos));
   }, [todos]);
   
   const handleNewTodo = (e) => {
     setNewTodo(e.target.value);
   }
-  const handleAddTodo = (e) => {
-    if (newTodo !== '') {
-        setTodos([...todos, newTodo]);
-        setNewTodo('');
-        document.getElementById("err").innerHTML=""
 
-      }else {
-        document.getElementById("err").innerHTML="please Enter To DO"
+  const handleAddTodo = () => {
+    if (newTodo !== '') {
+      setTodos([...todos, newTodo]);
+      // localStorage.setItem('todos', JSON.stringify(todos));    
+      setNewTodo('');
+    }else {
+      setOpen(false);
       }
   }
 
@@ -60,10 +62,7 @@ export default function Todo() {
         noValidate
         autoComplete="off"
       >
-        {/* <div>
-       <label htmlFor="name">Name</label>
-       <input type="text" id='name' name='name' placeholder='Enter name'/>
-      </div> */}
+
         <div>
         <FormControl>
                         <TextField
@@ -71,45 +70,75 @@ export default function Todo() {
                           minRows={3}
                           onChange={handleNewTodo}
                           sx={{
-                            minWidth: 300,
+                            minWidth: 200,
                           }}
                           value={newTodo}
                         />
-                        <Button variant="contained" color="primary" sx={{ m: 2 }} onClick={handleAddTodo}>Add To Do</Button>
+                        <Button variant="contained" sx={{ m: 2,backgroundColor:'blue',color:'white'}} onClick={handleAddTodo}>Add To Do</Button>
                   </FormControl>
-                  <div id="err" style={{color:'red'}}>"Please Enter todo"</div>
-        </div>
-        {/* <div style={{ color: "red" }}>
-          {errors.name && touched.name ? errors.name : null}
-        </div> */}
-
-        <div>
-          <Button
-            variant="outlined"
-            type="submit"
-            style={{ marginTop: "10px" }}
-          >
-            ADD
-          </Button>
+                  <div id="err" style={{color:'red'}}>{!open?"Please Enter todo":null}</div>
         </div>
     
         <Box sx={{ width : '100%' , bgcolor : 'background.paper' }}>
-              <List
-                  sx={{ width: '100%' , bgcolor: 'background.paper' }}
-              >
+<Stack
+  direction="column"
+  justifyContent="center"
+  alignItems="center"
+  spacing={2}
+
+
+>
                   {todos.map((todo, index) => (
-                    <ListItem key={index} sx = {{ bgcolor : "#f5f5f5" }}>
-                      <ListItemText  primary={todo} >
-                           {todo}
-                      </ListItemText>
-                      <ListItemSecondaryAction>
-                        <IconButton edge="end" aria-label="delete" onClick={() => handleDeleteTodo(index)}>
+
+
+<Stack
+  direction="column"
+  justifyContent="center"
+  alignItems="center"
+  spacing={2}
+  style={{
+    display: "container",
+    padding: "25px",
+    borderRadius: "5px",
+    margin: "10px",
+    marginRight: "10px",
+    justifyContent: "center",
+    width: "80%",
+  }}
+  sx={{
+    color: "black",
+    border: "1px solid black",
+  }}
+  key={index}
+>
+  <div style={{display:'flex'}}   >
+<p sx={{margin:'auto'}}>{todo}</p>
+<Button
+        variant="outlined"
+        type="button"
+        sx={{
+      display: "flex",
+      justifyContent: "end",
+      margin:'auto',
+          marginTop: "5px",
+          marginBottom: "5px",
+          marginLeft: "18px",
+          color: "black",
+          border: "1px solid black",
+          "&:hover": {
+            color: "white",
+            backgroundColor: "blue",
+            border: "1px solid blue",
+          },
+        }}
+       edge="end" aria-label="delete" onClick={() => handleDeleteTodo(index)}>
                           Delete
-                        </IconButton>
-                      </ListItemSecondaryAction>
-                    </ListItem>
-                  ))}
-              </List>
+                         </Button>
+  </div>
+
+</Stack>
+))}
+</Stack>
                <Typography align="right" color="inherit" component="div" sx = {{margin : 2}}>
                     {todos.length} To Do
                 </Typography>
